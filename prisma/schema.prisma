@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../lib/generated/prisma"
@@ -10,4 +5,144 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Platform {
+  facebook
+  instagram
+  linkedin
+}
+
+enum PostStatus {
+  draft
+  scheduled
+  publishing
+  published
+  failed
+}
+
+enum PlatformPostStatus {
+  pending
+  published
+  failed
+}
+
+enum ReplySource {
+  keyword_rule
+  ai_generated
+}
+
+enum ReplyStatus {
+  pending_review
+  approved
+  posted
+  rejected
+}
+
+enum MatchType {
+  exact
+  contains
+  regex
+}
+
+model SocialAccount {
+  id               String         @id @default(uuid())
+  platform         Platform
+  platformUserId   String
+  platformUsername  String
+  accessToken      String
+  refreshToken     String?
+  tokenExpiresAt   DateTime?
+  connectedBy      String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  platformPosts    PlatformPost[]
+
+  @@unique([platform, platformUserId])
+}
+
+model Post {
+  id            String         @id @default(uuid())
+  content       String
+  status        PostStatus     @default(draft)
+  scheduledAt   DateTime?
+  createdBy     String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  mediaFiles    MediaFile[]
+  platformPosts PlatformPost[]
+}
+
+model PlatformPost {
+  id              String             @id @default(uuid())
+  postId          String
+  socialAccountId String
+  platformPostId  String?
+  status          PlatformPostStatus @default(pending)
+  errorMessage    String?
+  publishedAt     DateTime?
+  post            Post               @relation(fields: [postId], references: [id], onDelete: Cascade)
+  socialAccount   SocialAccount      @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+  comments        Comment[]
+
+  @@index([postId])
+  @@index([socialAccountId])
+}
+
+model MediaFile {
+  id           String   @id @default(uuid())
+  postId       String
+  originalName String
+  mimeType     String
+  size         Int
+  minioKey     String
+  createdAt    DateTime @default(now())
+  post         Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+}
+
+model Comment {
+  id                String        @id @default(uuid())
+  platformPostId    String
+  platformCommentId String
+  authorName        String
+  content           String
+  fetchedAt         DateTime      @default(now())
+  platformPost      PlatformPost  @relation(fields: [platformPostId], references: [id], onDelete: Cascade)
+  reply             CommentReply?
+
+  @@unique([platformPostId, platformCommentId])
+  @@index([platformPostId])
+}
+
+model CommentReply {
+  id         String      @id @default(uuid())
+  commentId  String      @unique
+  content    String
+  source     ReplySource
+  status     ReplyStatus @default(pending_review)
+  reviewedBy String?
+  reviewedAt DateTime?
+  postedAt   DateTime?
+  comment    Comment     @relation(fields: [commentId], references: [id], onDelete: Cascade)
+}
+
+model KeywordRule {
+  id            String    @id @default(uuid())
+  keyword       String
+  replyTemplate String
+  matchType     MatchType @default(contains)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+}
+
+model AIPersona {
+  id              String   @id @default(uuid())
+  name            String
+  tone            String
+  businessContext String
+  instructions    String
+  isDefault       Boolean  @default(false)
+  createdAt       DateTime @default(now())
 }
