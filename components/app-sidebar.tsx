@@ -70,7 +70,7 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="border-t p-4">
         <div className="flex items-center justify-between">
-          <UserButton afterSignOutUrl="/sign-in" />
+          <UserButton />
           <Link href="/settings">
             <SidebarMenuButton size="sm" tooltip="Settings">
               <SettingsIcon className="h-4 w-4" />
@@ -98,11 +98,12 @@ function NavGroup({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton asChild isActive={pathname === item.href || pathname.startsWith(item.href + "/")}>
-                <Link href={item.href}>
-                  <item.icon className="h-4 w-4" />
-                  <span>{item.title}</span>
-                </Link>
+              <SidebarMenuButton
+                render={<Link href={item.href} />}
+                isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
+              >
+                <item.icon className="h-4 w-4" />
+                <span>{item.title}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
