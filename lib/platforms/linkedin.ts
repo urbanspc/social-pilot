@@ -104,6 +104,16 @@ export class LinkedInAdapter implements PlatformAdapter {
     return postId
   }
 
+  async deletePost(account: SocialAccount, platformPostId: string): Promise<void> {
+    // LinkedIn API doesn't easily support post deletion via API
+    throw new Error("LinkedIn post deletion is not supported via API")
+  }
+
+  async updatePost(account: SocialAccount, platformPostId: string, content: string): Promise<void> {
+    // LinkedIn API doesn't easily support post editing via API
+    throw new Error("LinkedIn post editing is not supported via API")
+  }
+
   async fetchComments(account: SocialAccount, platformPostId: string): Promise<PlatformComment[]> {
     const token = decrypt(account.accessToken)
 

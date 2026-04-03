@@ -120,10 +120,66 @@ export async function publishPost(postId: string) {
 export async function deletePost(postId: string) {
   const session = await auth()
   if (!session?.user) throw new Error("Unauthorized")
-  const userId = session.user.id!
+
+  // Delete from platforms (Facebook, etc.) before deleting locally
+  const postWithPlatforms = await db.platformPost.findMany({
+    where: { postId },
+    include: { socialAccount: true },
+  })
+
+  for (const pp of postWithPlatforms) {
+    if (pp.platformPostId && pp.socialAccount) {
+      try {
+        const { getAdapter } = await import("@/lib/platforms/registry")
+        const adapter = getAdapter(pp.socialAccount.platform)
+        await adapter.deletePost(pp.socialAccount, pp.platformPostId)
+      } catch (err) {
+        console.error("Platform delete failed:", err)
+      }
+    }
+  }
 
   await db.post.delete({ where: { id: postId } })
 
   revalidatePath("/posts")
   redirect("/posts")
+}
+
+
+export async function editPost(postId: string, newContent: string) {
+  const session = await auth()
+  if (!session?.user) throw new Error("Unauthorized")
+
+  // Update on platforms (Facebook, etc.)
+  const postWithPlatforms = await db.platformPost.findMany({
+    where: { postId, status: "published" },
+    include: { socialAccount: true },
+  })
+
+  const errors: string[] = []
+  for (const pp of postWithPlatforms) {
+    if (pp.platformPostId && pp.socialAccount) {
+      try {
+        const { getAdapter } = await import("@/lib/platforms/registry")
+        const adapter = getAdapter(pp.socialAccount.platform)
+        await adapter.updatePost(pp.socialAccount, pp.platformPostId, newContent)
+      } catch (err: any) {
+        errors.push(`${pp.socialAccount.platform}: ${err.message}`)
+      }
+    }
+  }
+
+  // Update locally
+  await db.post.update({
+    where: { id: postId },
+    data: { content: newContent },
+  })
+
+  revalidatePath("/posts")
+  revalidatePath(`/posts/${postId}`)
+
+  if (errors.length > 0) {
+    return { success: true, warnings: errors }
+  }
+  return { success: true }
 }

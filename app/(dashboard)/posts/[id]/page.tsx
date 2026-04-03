@@ -9,6 +9,7 @@ import { getFileUrl } from "@/lib/storage"
 import { Globe, Camera, Briefcase, ArrowLeftIcon, ImageIcon, FileVideoIcon } from "lucide-react"
 import { deletePost } from "@/app/actions/posts"
 import Link from "next/link"
+import { EditPostForm } from "@/components/posts/edit-post-form"
 import { formatDistanceToNow } from "date-fns"
 
 const platformIcons: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -66,7 +67,7 @@ export default async function PostDetailPage({
               <CardTitle>Content</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="whitespace-pre-wrap">{post.content}</p>
+              <EditPostForm postId={post.id} currentContent={post.content} />
             </CardContent>
           </Card>
 

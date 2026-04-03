@@ -33,6 +33,11 @@ export async function GET(request: NextRequest) {
     const adapter = getAdapter("linkedin")
     const result = await adapter.handleCallback(code, redirectUri)
 
+    // Validate tokenExpiresAt — some platforms return invalid dates
+    const tokenExpiresAt = result.tokenExpiresAt instanceof Date && !isNaN(result.tokenExpiresAt.getTime())
+      ? result.tokenExpiresAt
+      : null
+
     await db.socialAccount.upsert({
       where: {
         platform_platformUserId: {
@@ -44,7 +49,7 @@ export async function GET(request: NextRequest) {
         platformUsername: result.platformUsername,
         accessToken: encrypt(result.accessToken),
         refreshToken: result.refreshToken ? encrypt(result.refreshToken) : null,
-        tokenExpiresAt: result.tokenExpiresAt,
+        tokenExpiresAt,
       },
       create: {
         platform: result.platform,
@@ -52,14 +57,18 @@ export async function GET(request: NextRequest) {
         platformUsername: result.platformUsername,
         accessToken: encrypt(result.accessToken),
         refreshToken: result.refreshToken ? encrypt(result.refreshToken) : null,
-        tokenExpiresAt: result.tokenExpiresAt,
+        tokenExpiresAt,
         connectedBy: state.userId,
       },
     })
 
     redirect(`/accounts?success=linkedin+connected`)
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error"
+  } catch (err: any) {
+    // Next.js redirect() throws a special error — let it pass through
+    if (err?.digest?.startsWith('NEXT_REDIRECT')) throw err
+    const fullMessage = err instanceof Error ? err.message : "Unknown error"
+    const message = fullMessage.length > 100 ? fullMessage.substring(0, 100) + '...' : fullMessage
+    console.error('LinkedIn callback error:', fullMessage)
     redirect(`/accounts?error=${encodeURIComponent(message)}`)
   }
 }

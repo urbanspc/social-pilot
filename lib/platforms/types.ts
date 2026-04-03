@@ -22,6 +22,8 @@ export interface PlatformAdapter {
   publishPost(account: SocialAccount, content: string, media?: MediaFile[]): Promise<string>
   fetchComments(account: SocialAccount, platformPostId: string): Promise<PlatformComment[]>
   replyToComment(account: SocialAccount, commentId: string, text: string): Promise<void>
+  deletePost(account: SocialAccount, platformPostId: string): Promise<void>
+  updatePost(account: SocialAccount, platformPostId: string, content: string): Promise<void>
   refreshToken(account: SocialAccount): Promise<{
     accessToken: string
     refreshToken: string | null

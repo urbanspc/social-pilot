@@ -130,10 +130,29 @@ export class MetaAdapter implements PlatformAdapter {
     }
   }
 
-  async publishPost(account: SocialAccount, content: string, _media?: MediaFile[]): Promise<string> {
+  async publishPost(account: SocialAccount, content: string, media?: MediaFile[]): Promise<string> {
     const token = decrypt(account.accessToken)
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://elo-pro.com"
 
     if (this.platform === "facebook") {
+      // If media attached, post as photo(s)
+      if (media && media.length > 0) {
+        const firstImage = media[0]
+        const imageUrl = `${appUrl}/uploads/${firstImage.minioKey}`
+        const res = await fetch(`${META_GRAPH_URL}/${account.platformUserId}/photos`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: imageUrl, message: content, access_token: token }),
+        })
+        if (!res.ok) {
+          const err = await res.json()
+          throw new Error(`Facebook photo publish failed: ${err.error?.message}`)
+        }
+        const data = await res.json()
+        return data.post_id || data.id
+      }
+
+      // Text-only post
       const res = await fetch(`${META_GRAPH_URL}/${account.platformUserId}/feed`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -162,6 +181,32 @@ export class MetaAdapter implements PlatformAdapter {
       if (!publishRes.ok) throw new Error("Instagram publish failed")
       const data = await publishRes.json()
       return data.id
+    }
+  }
+
+  async deletePost(account: SocialAccount, platformPostId: string): Promise<void> {
+    const token = decrypt(account.accessToken)
+    const res = await fetch(`${META_GRAPH_URL}/${platformPostId}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ access_token: token }),
+    })
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(`Facebook delete failed: ${err.error?.message}`)
+    }
+  }
+
+  async updatePost(account: SocialAccount, platformPostId: string, content: string): Promise<void> {
+    const token = decrypt(account.accessToken)
+    const res = await fetch(`${META_GRAPH_URL}/${platformPostId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: content, access_token: token }),
+    })
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(`Facebook update failed: ${err.error?.message}`)
     }
   }
 
