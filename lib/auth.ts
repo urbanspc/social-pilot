@@ -1,24 +1,43 @@
-import { auth, currentUser } from "@clerk/nextjs/server"
+import { auth } from "@/auth"
 
 export type UserRole = "admin" | "member"
 
+export async function getSession() {
+  const session = await auth()
+  return session
+}
+
+export async function requireAuth() {
+  const session = await auth()
+  if (!session?.user) {
+    throw new Error("Unauthorized")
+  }
+  return session.user
+}
+
 export async function getUserRole(): Promise<UserRole> {
-  const { sessionClaims } = await auth()
-  return (sessionClaims?.metadata as { role?: UserRole })?.role ?? "member"
+  const session = await auth()
+  return ((session?.user as { role?: string })?.role as UserRole) ?? "member"
 }
 
 export async function requireAdmin() {
-  const role = await getUserRole()
+  const user = await requireAuth()
+  const role = (user as { role?: string }).role ?? "member"
   if (role !== "admin") {
     throw new Error("Unauthorized: admin access required")
   }
+  return user
 }
 
 export async function getAuthUser() {
-  const user = await currentUser()
-  if (!user) {
+  const session = await auth()
+  if (!session?.user) {
     throw new Error("Unauthorized")
   }
-  const role = await getUserRole()
-  return { id: user.id, role, email: user.emailAddresses[0]?.emailAddress }
+  const user = session.user
+  return {
+    id: user.id!,
+    role: ((user as { role?: string }).role as UserRole) ?? "member",
+    email: user.email!,
+  }
 }
