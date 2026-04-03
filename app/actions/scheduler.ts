@@ -1,12 +1,13 @@
 "use server"
 
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
 import { db } from "@/lib/db"
 
 export async function reschedulePost(postId: string, newDate: string) {
-  const { userId } = await auth()
-  if (!userId) throw new Error("Unauthorized")
+  const session = await auth()
+  if (!session?.user) throw new Error("Unauthorized")
+  const userId = session.user.id!
 
   const post = await db.post.findUnique({ where: { id: postId } })
   if (!post) throw new Error("Post not found")
@@ -22,8 +23,9 @@ export async function reschedulePost(postId: string, newDate: string) {
 }
 
 export async function cancelScheduledPost(postId: string) {
-  const { userId } = await auth()
-  if (!userId) throw new Error("Unauthorized")
+  const session = await auth()
+  if (!session?.user) throw new Error("Unauthorized")
+  const userId = session.user.id!
 
   const post = await db.post.findUnique({ where: { id: postId } })
   if (!post) throw new Error("Post not found")

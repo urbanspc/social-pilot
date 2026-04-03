@@ -1,14 +1,15 @@
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/auth"
 import { NextRequest } from "next/server"
 import { getAdapter } from "@/lib/platforms/registry"
 import type { Platform } from "@/lib/generated/prisma/client"
 import { randomBytes } from "crypto"
 
 export async function POST(request: NextRequest) {
-  const { userId } = await auth()
-  if (!userId) {
+  const session = await auth()
+  if (!session?.user) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
+  const userId = session.user.id!
 
   const body = await request.json()
   const platform = body.platform as Platform

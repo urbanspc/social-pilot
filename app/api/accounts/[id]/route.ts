@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/auth"
 import { NextRequest } from "next/server"
 import { db } from "@/lib/db"
 import { getUserRole } from "@/lib/auth"
@@ -7,8 +7,8 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { userId } = await auth()
-  if (!userId) {
+  const session = await auth()
+  if (!session?.user) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
 

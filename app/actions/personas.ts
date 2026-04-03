@@ -1,13 +1,13 @@
 "use server"
 
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
 import { db } from "@/lib/db"
 import { getUserRole } from "@/lib/auth"
 
 export async function createPersona(formData: FormData) {
-  const { userId } = await auth()
-  if (!userId) throw new Error("Unauthorized")
+  const session = await auth()
+  if (!session?.user) throw new Error("Unauthorized")
   const role = await getUserRole()
   if (role !== "admin") throw new Error("Admin access required")
 
@@ -43,8 +43,8 @@ export async function createPersona(formData: FormData) {
 }
 
 export async function setDefaultPersona(personaId: string) {
-  const { userId } = await auth()
-  if (!userId) throw new Error("Unauthorized")
+  const session = await auth()
+  if (!session?.user) throw new Error("Unauthorized")
 
   await db.aIPersona.updateMany({
     where: { isDefault: true },
@@ -60,8 +60,8 @@ export async function setDefaultPersona(personaId: string) {
 }
 
 export async function deletePersona(personaId: string) {
-  const { userId } = await auth()
-  if (!userId) throw new Error("Unauthorized")
+  const session = await auth()
+  if (!session?.user) throw new Error("Unauthorized")
 
   await db.aIPersona.delete({ where: { id: personaId } })
   revalidatePath("/auto-reply/personas")

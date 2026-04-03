@@ -1,10 +1,10 @@
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/auth"
 import { NextRequest } from "next/server"
 import { uploadFile, getFileUrl } from "@/lib/storage"
 
 export async function POST(request: NextRequest) {
-  const { userId } = await auth()
-  if (!userId) {
+  const session = await auth()
+  if (!session?.user) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
 

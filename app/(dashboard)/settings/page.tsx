@@ -1,4 +1,4 @@
-import { auth, currentUser } from "@clerk/nextjs/server"
+import { auth } from "@/auth"
 import { db } from "@/lib/db"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -12,7 +12,7 @@ import {
 } from "lucide-react"
 
 export default async function SettingsPage() {
-  const user = await currentUser()
+  const session = await auth()
   const role = await getUserRole()
 
   const [accountCount, postCount, ruleCount, personaCount] = await Promise.all([
@@ -46,7 +46,7 @@ export default async function SettingsPage() {
         <CardContent className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Email</span>
-            <span className="text-sm">{user?.emailAddresses[0]?.emailAddress ?? "N/A"}</span>
+            <span className="text-sm">{session?.user?.email ?? "N/A"}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Role</span>
@@ -54,7 +54,7 @@ export default async function SettingsPage() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">User ID</span>
-            <span className="text-xs text-muted-foreground font-mono">{user?.id}</span>
+            <span className="text-xs text-muted-foreground font-mono">{session?.user?.id}</span>
           </div>
         </CardContent>
       </Card>

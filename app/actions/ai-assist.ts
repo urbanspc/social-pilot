@@ -1,12 +1,12 @@
 "use server"
 
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/auth"
 import Anthropic from "@anthropic-ai/sdk"
 import { db } from "@/lib/db"
 
 export async function aiAssistPost(content: string, action: "improve" | "hashtags" | "shorten" | "expand" | "ideas") {
-  const { userId } = await auth()
-  if (!userId) throw new Error("Unauthorized")
+  const session = await auth()
+  if (!session?.user) throw new Error("Unauthorized")
 
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey || apiKey === "placeholder") {

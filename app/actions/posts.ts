@@ -1,6 +1,6 @@
 "use server"
 
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { db } from "@/lib/db"
@@ -8,8 +8,9 @@ import { getAdapter } from "@/lib/platforms/registry"
 import type { PostStatus } from "@/lib/generated/prisma/client"
 
 export async function createPost(formData: FormData) {
-  const { userId } = await auth()
-  if (!userId) throw new Error("Unauthorized")
+  const session = await auth()
+  if (!session?.user) throw new Error("Unauthorized")
+  const userId = session.user.id!
 
   const content = formData.get("content") as string
   const platformIds = formData.getAll("platformIds") as string[]
@@ -57,8 +58,9 @@ export async function createPost(formData: FormData) {
 }
 
 export async function publishPost(postId: string) {
-  const { userId } = await auth()
-  if (!userId) throw new Error("Unauthorized")
+  const session = await auth()
+  if (!session?.user) throw new Error("Unauthorized")
+  const userId = session.user.id!
 
   const post = await db.post.findUnique({
     where: { id: postId },
@@ -116,8 +118,9 @@ export async function publishPost(postId: string) {
 }
 
 export async function deletePost(postId: string) {
-  const { userId } = await auth()
-  if (!userId) throw new Error("Unauthorized")
+  const session = await auth()
+  if (!session?.user) throw new Error("Unauthorized")
+  const userId = session.user.id!
 
   await db.post.delete({ where: { id: postId } })
 

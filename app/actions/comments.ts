@@ -1,12 +1,13 @@
 "use server"
 
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
 import { db } from "@/lib/db"
 
 export async function approveReply(replyId: string, editedContent?: string) {
-  const { userId } = await auth()
-  if (!userId) throw new Error("Unauthorized")
+  const session = await auth()
+  if (!session?.user) throw new Error("Unauthorized")
+  const userId = session.user.id!
 
   const reply = await db.commentReply.findUnique({
     where: { id: replyId },
@@ -36,8 +37,9 @@ export async function approveReply(replyId: string, editedContent?: string) {
 }
 
 export async function rejectReply(replyId: string) {
-  const { userId } = await auth()
-  if (!userId) throw new Error("Unauthorized")
+  const session = await auth()
+  if (!session?.user) throw new Error("Unauthorized")
+  const userId = session.user.id!
 
   await db.commentReply.update({
     where: { id: replyId },
