@@ -130,7 +130,7 @@ export class MetaAdapter implements PlatformAdapter {
     }
   }
 
-  async publishPost(account: SocialAccount, content: string, media?: MediaFile[]): Promise<string> {
+  async publishPost(account: SocialAccount, content: string, _media?: MediaFile[]): Promise<string> {
     const token = decrypt(account.accessToken)
 
     if (this.platform === "facebook") {

@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { FacebookIcon, InstagramIcon, LinkedinIcon, TrashIcon } from "lucide-react"
+import { Globe, Camera, Briefcase, TrashIcon } from "lucide-react"
 
 type Account = {
   id: string
@@ -26,9 +26,9 @@ type Account = {
 }
 
 const platformIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-  facebook: FacebookIcon,
-  instagram: InstagramIcon,
-  linkedin: LinkedinIcon,
+  facebook: Globe,
+  instagram: Camera,
+  linkedin: Briefcase,
 }
 
 const platformLabels: Record<string, string> = {
@@ -58,7 +58,7 @@ export function AccountCard({
   account: Account
   onDisconnect: (id: string) => void
 }) {
-  const Icon = platformIcons[account.platform] ?? FacebookIcon
+  const Icon = platformIcons[account.platform] ?? Globe
   const label = platformLabels[account.platform] ?? account.platform
 
   return (
@@ -78,10 +78,8 @@ export function AccountCard({
             {healthLabels[account.tokenHealth]}
           </Badge>
           <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <TrashIcon className="h-4 w-4 text-destructive" />
-              </Button>
+            <AlertDialogTrigger render={<Button variant="ghost" size="icon" />}>
+              <TrashIcon className="h-4 w-4 text-destructive" />
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>

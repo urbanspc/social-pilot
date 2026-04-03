@@ -10,13 +10,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { FacebookIcon, InstagramIcon, LinkedinIcon, PlusIcon } from "lucide-react"
+import { Globe, Camera, Briefcase, PlusIcon } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 
 const platforms = [
-  { id: "facebook", label: "Facebook", icon: FacebookIcon, description: "Connect a Facebook Page" },
-  { id: "instagram", label: "Instagram", icon: InstagramIcon, description: "Connect an Instagram Business account" },
-  { id: "linkedin", label: "LinkedIn", icon: LinkedinIcon, description: "Connect your LinkedIn profile" },
+  { id: "facebook", label: "Facebook", icon: Globe, description: "Connect a Facebook Page" },
+  { id: "instagram", label: "Instagram", icon: Camera, description: "Connect an Instagram Business account" },
+  { id: "linkedin", label: "LinkedIn", icon: Briefcase, description: "Connect your LinkedIn profile" },
 ]
 
 export function ConnectAccountDialog() {
@@ -33,7 +33,7 @@ export function ConnectAccountDialog() {
       })
       const data = await res.json()
       if (data.authUrl) {
-        window.location.href = data.authUrl
+        window.location.assign(data.authUrl)
       }
     } catch {
       setConnecting(null)
@@ -42,11 +42,9 @@ export function ConnectAccountDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <PlusIcon className="mr-2 h-4 w-4" />
-          Connect Account
-        </Button>
+      <DialogTrigger render={<Button />}>
+        <PlusIcon className="mr-2 h-4 w-4" />
+        Connect Account
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
