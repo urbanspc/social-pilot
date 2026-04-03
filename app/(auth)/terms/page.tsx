@@ -8,7 +8,7 @@ export default function TermsOfServicePage() {
         <section>
           <h2 className="text-lg font-semibold">1. Acceptance of Terms</h2>
           <p>
-            By accessing and using Social Copilot at elo-pro.com ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, do not use the Service.
+            By accessing and using Social Copilot at elo-pro.com (&ldquo;the Service&rdquo;), you agree to be bound by these Terms of Service. If you do not agree to these terms, do not use the Service.
           </p>
         </section>
 
@@ -33,9 +33,9 @@ export default function TermsOfServicePage() {
           <h2 className="text-lg font-semibold">4. Acceptable Use</h2>
           <p>You agree not to:</p>
           <ul className="mt-2 list-disc list-inside space-y-1">
-            <li>Use the Service to violate any social media platform's terms of service</li>
+            <li>Use the Service to violate any social media platform&apos;s terms of service</li>
             <li>Post spam, misleading, or harmful content through the Service</li>
-            <li>Attempt to gain unauthorized access to other users' accounts or data</li>
+            <li>Attempt to gain unauthorized access to other users&apos; accounts or data</li>
             <li>Use the Service for any illegal or unauthorized purpose</li>
             <li>Bypass or interfere with security features of the Service</li>
           </ul>
@@ -65,7 +65,7 @@ export default function TermsOfServicePage() {
         <section>
           <h2 className="text-lg font-semibold">8. Limitation of Liability</h2>
           <p>
-            The Service is provided "as is" without warranties of any kind. We are not liable for any damages arising from the use of the Service, including but not limited to issues with social media platform APIs, failed post publications, or AI-generated content.
+            The Service is provided &ldquo;as is&rdquo; without warranties of any kind. We are not liable for any damages arising from the use of the Service, including but not limited to issues with social media platform APIs, failed post publications, or AI-generated content.
           </p>
         </section>
 

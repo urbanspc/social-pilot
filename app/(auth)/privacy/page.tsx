@@ -8,7 +8,7 @@ export default function PrivacyPolicyPage() {
         <section>
           <h2 className="text-lg font-semibold">1. Introduction</h2>
           <p>
-            Social Copilot ("we", "our", "us") operates the elo-pro.com website. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our service.
+            Social Copilot (&ldquo;we&rdquo;, &ldquo;our&rdquo;, &ldquo;us&rdquo;) operates the elo-pro.com website. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our service.
           </p>
         </section>
 
@@ -48,7 +48,7 @@ export default function PrivacyPolicyPage() {
             <li><strong>Clerk:</strong> For user authentication and session management.</li>
             <li><strong>Meta (Facebook/Instagram):</strong> To publish posts and manage comments via the Graph API.</li>
             <li><strong>LinkedIn:</strong> To publish posts and manage comments via the LinkedIn API.</li>
-            <li><strong>Anthropic (Claude AI):</strong> To generate content suggestions and auto-replies. Your content may be sent to Anthropic's API for processing.</li>
+            <li><strong>Anthropic (Claude AI):</strong> To generate content suggestions and auto-replies. Your content may be sent to Anthropic&apos;s API for processing.</li>
           </ul>
         </section>
 

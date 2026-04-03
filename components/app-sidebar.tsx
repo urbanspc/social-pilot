@@ -14,6 +14,7 @@ import {
   UserIcon,
   BotIcon,
   SettingsIcon,
+  LogOutIcon,
 } from "lucide-react"
 import {
   Sidebar,
@@ -27,7 +28,8 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar"
-import { UserButton } from "@clerk/nextjs"
+import { signOut } from "next-auth/react"
+import { Button } from "@/components/ui/button"
 
 const mainNav = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboardIcon },
@@ -70,7 +72,9 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="border-t p-4">
         <div className="flex items-center justify-between">
-          <UserButton />
+          <Button variant="ghost" size="icon" onClick={() => signOut({ callbackUrl: "/sign-in" })}>
+            <LogOutIcon className="h-4 w-4" />
+          </Button>
           <Link href="/settings">
             <SidebarMenuButton size="sm" tooltip="Settings">
               <SettingsIcon className="h-4 w-4" />
