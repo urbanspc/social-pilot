@@ -13,6 +13,7 @@ import { PlatformSelect } from "./platform-select"
 import { SendIcon, ClockIcon } from "lucide-react"
 import { toast } from "sonner"
 import { createPost } from "@/app/actions/posts"
+import { AIAssistButton } from "./ai-assist-button"
 
 export function PostComposer() {
   const router = useRouter()
@@ -22,6 +23,7 @@ export function PostComposer() {
   const [scheduledAt, setScheduledAt] = useState("")
   const [showSchedule, setShowSchedule] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [aiSuggestion, setAiSuggestion] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -81,9 +83,36 @@ export function PostComposer() {
                   onChange={(e) => setContent(e.target.value)}
                   className="min-h-[150px] resize-y"
                 />
-                <p className="mt-1 text-xs text-muted-foreground text-right">
-                  {charCount} characters
-                </p>
+                <div className="mt-1 flex items-center justify-between">
+                  <AIAssistButton content={content} onResult={setAiSuggestion} />
+                  <p className="text-xs text-muted-foreground">{charCount} characters</p>
+                </div>
+                {aiSuggestion && (
+                  <div className="rounded-md border bg-muted/50 p-3">
+                    <p className="text-xs font-medium text-muted-foreground mb-2">AI Suggestion:</p>
+                    <p className="text-sm whitespace-pre-wrap">{aiSuggestion}</p>
+                    <div className="mt-2 flex gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => {
+                          setContent(aiSuggestion)
+                          setAiSuggestion(null)
+                        }}
+                      >
+                        Use this
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setAiSuggestion(null)}
+                      >
+                        Dismiss
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
               <Separator />
               <div>
